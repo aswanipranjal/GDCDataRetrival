@@ -1,32 +1,47 @@
 import requests
 import json
 
-file_endpt = 'https://gdc-api.nci.nih.gov/data/'
-file_uuid = '0004d251-3f70-4395-b175-c94c2f5b1b81'
-response = requests.get(file_endpt + file_uuid)
-print(json.dumps(response.json(), indent=2))
-''' Response
-{
-  "data": {
-    "data_type": "Aligned Reads",
-    "updated_datetime": "2016-05-26T17:06:40.003624-05:00",
-    "created_datetime": "2016-05-26T17:06:40.003624-05:00",
-    "file_name": "0017ba4c33a07ba807b29140b0662cb1_gdc_realn.bam",
-    "md5sum": "a08304b120c5df76b6532da0e9a35ced",
-    "data_format": "BAM",
-    "acl": [
-      "phs000178"
-    ],
-    "access": "controlled",
-    "platform": "Illumina",
-    "state": "submitted",
-    "file_id": "d853e541-f16a-4345-9f00-88e03c2dc0bc",
-    "data_category": "Raw Sequencing Data",
-    "file_size": 23650901931,
-    "submitter_id": "c30188d7-be1a-4b43-9a17-e19ccd71792e",
-    "type": "aligned_reads",
-    "file_state": "processed",
-    "experimental_strategy": "WXS"
-  },
-  "warnings": {}
-}'''
+file_endpt = 'https://gdc-api.nci.nih.gov/files/'
+
+payload = {
+    "filters":{
+        "op":"and",
+        "content":[
+            {
+                "op":"in",
+                "content":{
+                    "field":"cases.submitter_id",
+                    "value":[
+                        "TCGA-CK-4948",
+                        "TCGA-D1-A17N",
+                        "TCGA-4V-A9QX",
+                        "TCGA-4V-A9QM"
+                    ]
+                }
+            },
+            {
+                "op":"=",
+                "content":{
+                    "field":"files.data_type",
+                    "value":"Gene Expression Quantification"
+                }
+            }
+        ]
+    },
+    "format":"tsv",
+    "fields":"file_id,file_name,cases.submitter_id,cases.case_id,data_category,data_type,cases.samples.tumor_descriptor,cases.samples.tissue_type,cases.samples.sample_type,cases.samples.submitter_id,cases.samples.sample_id,analysis.workflow_type,cases.project.project_id,cases.samples.portions.analytes.aliquots.aliquot_id,cases.samples.portions.analytes.aliquots.submitter_id",
+    "size":"1000"
+}
+
+headers = {"Content-Type" : "application/json"}
+r = requests.post(url=file_endpt, headers=headers, json=payload)
+
+response_data = r.text
+
+print(type(response_data))
+
+
+
+
+
+
