@@ -6,49 +6,69 @@ import pandas
 
 from functools import reduce
 
-#headers for the request
+# headers for the request
 headers = {'content-type': 'application/json'}
 
-#url to search the data
+# url to search the data
 search_url = "https://gdc-api.nci.nih.gov/files"
 
-#url to download the data
+# url to download the data
 download_url = "https://gdc-api.nci.nih.gov/data"
 
+def load_payload(file_name):
+    print("Loading payload file..\n")
+    with open(file_name) as payload_file:    
+        payload = json.load(payload_file)
+    return payload
 
-with open('payload.json') as payload_file:    
-    payload = json.load(payload_file)
+def make_requests(url, payload = None, headers = None):
+    print("making requests to " + url + "\n")
+    r = requests.post(search_url, json=payload, headers=headers)
+    response_data = json.loads(r.text)
+    return response_data
 
-#making the request
-r = requests.post(search_url, json=payload, headers=headers)
-response_data = json.loads(r.text)
+# downloads the file based on the given UUID
+def download_data(download_url, UUID, local_filename):
+    print("dowloading file: " + local_filename + "\n")
+    req = requests.get(download_url + "/" + UUID, stream=True)
+    with open(local_filename, 'wb') as f:
+        for chunk in req.iter_content(chunk_size=1024):
+            if chunk:
+                f.write(chunk)
+                f.flush()
 
-file_names = []
-file_ids = []
+def get_values(data_dict, value):
+    return data_dict[value]
 
-#this loop, downloads the data ans saves the file names and file ids into the lists initialized above
-for i in range(len(response_data["data"]["hits"])):
-    os.system("curl --remote-name --remote-header-name '{0}/{1}'".format(download_url, response_data["data"]["hits"][i]["file_id"]))
-    file_ids.append(response_data["data"]["hits"][i]["file_id"])
-    file_names.append(response_data["data"]["hits"][i]["file_name"])
+# opens the zip files and converts the data into a pandas.DataFrame object
+def zip_to_dataframe(file_name, column_names):
+    with gzip.open(os.getcwd() + "/" + file_name, 'rb') as f:
+        df = pandas.read_table(f, names = column_names)
+    return df
 
-#get the current working directory
-cwd = os.getcwd()
-dataframe_files = []
+def merge_dataframes(df_list, merge_column):
+    return reduce(lambda left, right: pandas.merge(left, right, on=merge_column), df_list)
 
-#this loop opens the zip files and converts the data into a pandas.DataFrame object
-for i in range(len(file_names)):
-    with gzip.open(cwd+"/"+file_names[i], 'rb') as f:
-        dataframe_files.append(pandas.read_table(f, names=["Gene", file_ids[i] ]))
+def df_to_csv(df, filename, sep = ",", index = False):
+    df.to_csv(filename, sep = sep, index = index)
 
+if __name__ == '__main__':
 
-#merging the dataframes together to form one single data frame
-df_final = reduce(lambda left,right: pandas.merge(left,right,on='Gene'), dataframe_files)
-
-#save the data frame as a TSV file
-df_final.to_csv("response.tsv", sep = " ", index = False)
-
-df = pandas.read_csv("response.tsv", sep=" ")
-
-#print the accumulated data
-print(df)
+    payload = load_payload("payload.json")
+    
+    response = make_requests(search_url, payload, headers)
+    
+    file_names = [get_values(response["data"]["hits"][i], "file_name") for i in range(len(response["data"]["hits"]))]
+    
+    file_ids = [get_values(response["data"]["hits"][i], "file_id") for i in range(len(response["data"]["hits"]))]
+    
+    for i in range(len(response["data"]["hits"])):
+        download_data(download_url, file_ids[i], file_names[i])
+    
+    dataframe_files = [zip_to_dataframe(file_names[i], ["Gene", file_ids[i]]) for i in range(len(file_names))]
+    
+    df_to_csv(merge_dataframes(dataframe_files, "Gene"), "response.tsv", sep = " ")
+    
+    df = pandas.read_csv("response.tsv", sep=" ")
+    
+    print(df)
