@@ -1,0 +1,55 @@
+/*
+
+*/
+{
+"filters":
+        {
+            "op":"and",
+            "content":
+                    [
+                        { 
+                            "op":"in",
+                            "content":
+                                        { 
+                                            "field":"cases.project.project_id", 
+                                            "value":["TCGA-PAAD"]
+                                        } 
+                        },
+
+                        {   "op":"in",
+                            "content":
+                                        {
+                                            "field":"files.access",
+                                            "value":["open"]
+                                        }
+                        },
+
+                        {   "op":"in",
+                            "content":
+                                        {
+                                            "field":"files.data_category",
+                                            "value":["Transcriptome Profiling"]
+                                        }
+                        },
+
+                        {   "op":"in",
+                            "content":
+                                        {
+                                            "field":"files.data_type",
+                                            "value":["Gene Expression Quantification"]
+                                        }
+                        },
+
+                        {   "op":"in",
+                            "content":
+                                        {
+                                            "field":"files.analysis.workflow_type",
+                                            "value":["HTSeq - FPKM"]
+                                        }
+                        }
+                    ]
+        }, 
+            "format":"txt",
+            "size":"10",
+            "facetTab":"files"
+}
