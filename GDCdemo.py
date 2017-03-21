@@ -37,8 +37,8 @@ def download_data(download_url, UUID, local_filename):
                 f.write(chunk)
                 f.flush()
 
-def get_values(data_dict, value):
-    return data_dict[value]
+def get_value(dictionary, value):
+    return dictctionary[value]
 
 # opens the zip files and converts the data into a pandas.DataFrame object
 def zip_to_dataframe(file_name, column_names):
@@ -55,12 +55,12 @@ def df_to_csv(df, filename, sep = ",", index = False):
 if __name__ == '__main__':
 
     payload = load_payload("payload.json")
-    
+
     response = make_requests(search_url, payload, headers)
+
+    file_names = [get_value(response["data"]["hits"][i], "file_name") for i in range(len(response["data"]["hits"]))]
     
-    file_names = [get_values(response["data"]["hits"][i], "file_name") for i in range(len(response["data"]["hits"]))]
-    
-    file_ids = [get_values(response["data"]["hits"][i], "file_id") for i in range(len(response["data"]["hits"]))]
+    file_ids = [get_value(response["data"]["hits"][i], "file_id") for i in range(len(response["data"]["hits"]))]
     
     for i in range(len(response["data"]["hits"])):
         download_data(download_url, file_ids[i], file_names[i])
