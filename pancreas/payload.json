@@ -1,4 +1,7 @@
-payload = {
+/*
+
+*/
+{
 "filters":
         {
             "op":"and",
