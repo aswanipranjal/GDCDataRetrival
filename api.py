@@ -19,6 +19,8 @@ import subprocess
 import os
 import errno
 
+from clint.textui import progress
+
 __legacy = False
 __verbosity = 0
 logging.getLogger("requests").setLevel(logging.WARNING)
@@ -27,24 +29,6 @@ class GDCQuery(object):
     # Class variables
     ENDPOINTS = ('cases', 'files', 'programs', 'projects', 'submission')
     GDC_ROOT = 'https://gdc-api.nci.nih.gov/'
-
-    DATA_TYPES = [
-    "Gene Expression Quantification",
-    "Copy Number Segment",
-    "Masked Copy Number Segment",
-    "Methylation Beta Value",
-    "Isoform Expression Quantification",
-    "miRNA Expression Quantification",
-    "Biospecimen Supplement",
-    "Clinical Supplement"]
-
-    WORKFLOW_TYPES = [
-    "DNAcopy",
-    "BCGSC miRNA Profiling",
-    "Liftover",
-    "HTSeq - Counts",
-    "HTSeq - FPKM",
-    "HTSeq - FPKM-UQ"]
 
     # Queries returning more than this many results will log a warning
     WARN_RESULT_CT = 5000
@@ -167,12 +151,6 @@ class GDCQuery(object):
     def get(self, page_size=1000):
         return self._query_paginator(page_size=page_size)
 
-
-def create_dir(dir):
-    if not os.path.exists(dir):
-        print("creating directory: " + dir)
-        os.makedirs(dir)
-
 def get_projects(program=None):
     query = GDCQuery('projects')
     if program:
@@ -249,14 +227,16 @@ def curl_exists():
 
 def py_download_file(uuid, file_name, chunk_size=4096):
     """Download a single file from GDC."""
+    
     url = GDCQuery.GDC_ROOT
     if __legacy: url += 'legacy/'
     url += 'data/' + uuid
     r = requests.get(url, stream=True)
+    total_length = int(r.headers.get('content-length'))
     # TODO: Optimize chunk size
     # Larger chunk size == more memory, but fewer packets
     with open(file_name, 'wb') as f:
-        for chunk in r.iter_content(chunk_size=chunk_size):
+        for chunk in progress.bar(r.iter_content(chunk_size=chunk_size), expected_size=(total_length/chunk_size) + 1): 
             if chunk:
                 f.write(chunk)
 
