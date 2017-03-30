@@ -58,6 +58,14 @@ def create_dir(dir_name):
         os.makedirs(dir_name)
     else:
         print(dir_name + " already exists.")
+        
+def gzip_to_dataframe(filename, column_names = None):
+    with gzip.open(filename, 'rb') as f:
+        # unzip the file and convert it into a dataframe object
+        return pandas.read_table(f, names = column_names)
+    
+def merge_dataframes(df_list, col_name = None):
+    return reduce(lambda left,right: pandas.merge(left,right,on=col_name), df_list)
 
 def main():
 
@@ -96,14 +104,10 @@ def main():
                     filename = "/".join(cwd_path) + "/" + item["file_name"]
                     print("Downloading file: "+filename)
                     api.py_download_file(item["file_id"], filename)
-
-                    with gzip.open(filename, 'rb') as f:
-                        # unzip the downloaded file and convert it into a dataframe object
-                        dataframe_files.append(pandas.read_table(f, names=["Gene", item["submitter_id"] ]))
-                        
+                    dataframe_files.append(gzip_to_dataframe(filename, column_names=["Gene", item["submitter_id"] ]))
+                    
                 # merge all the downloaded files 
-                df_final = reduce(lambda left,right: pandas.merge(left,right,on='Gene'), dataframe_files)
-                
+                df_final = merge_dataframes(dataframe_files, 'Gene')
                 # create a condensed TSV file having all the downloaded samples
                 df_final.to_csv("/".join(cwd_path)+".txt", sep = " ", index = False)
                 cwd_path.pop()
