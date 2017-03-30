@@ -1,7 +1,7 @@
 # GDCDataRetrival
 A script to retrieve data from NCI's GDC data protal
 
-This script uses [gdctool](https://github.com/broadinstitute/gdctools) utilities created by Broad Institute.
+This script uses [gdctools](https://github.com/broadinstitute/gdctools) utilities created by Broad Institute.
 
 It will download all files belonging to a particular data type in all Project IDs present in a Project.
 All files will be downloaded in a /Data folder.
@@ -21,6 +21,6 @@ The file structure looks something like this:
       * file2.txt.gz  
     * HTSeq - FPKM.txt  
     * HTSeq - FPKM-UQ  
-  *TCGA-UCEC  
-  *TCGA-KIRC  
-  *TCGA-LUAD  
+ *TCGA-UCEC  
+ *TCGA-KIRC  
+ *TCGA-LUAD  
