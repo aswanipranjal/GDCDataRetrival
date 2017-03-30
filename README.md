@@ -1,5 +1,11 @@
 # GDCDataRetrival
-a sample program to retrieve data from NCI's GDC data protal
+A script to retrieve data from NCI's GDC data protal
 
-The sample_api_python file searches the data as specified by the payload.json file.
-It then downloads the searched data and puts it in a response.tsv file.
+This script uses gdctool utilities created by Broad Institute.
+
+It will download all files belonging to a particular data type in all Project IDs present in a Project.
+All files will be downloaded in a /Data folder.
+
+A folder will be created for each Project ID and inside that folder 10 files will be downloaded for each
+work-flow type specified. The folder will also contain a summary of all the files downloaded in the form
+of TSVs in a text file
