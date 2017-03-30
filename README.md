@@ -20,7 +20,7 @@ The file structure looks something like this:
          * file1.txt.gz  
          * file2.txt.gz  
       * HTSeq - FPKM.txt  
-      * HTSeq - FPKM-UQ  
+      * HTSeq - FPKM-UQ.txt  
    * TCGA-UCEC  
    * TCGA-KIRC  
    * TCGA-LUAD  
