@@ -11,6 +11,7 @@ work-flow type specified. The folder will also contain a summary of all the file
 of TSVs in a text file
 
 The file structure looks something like this:
+```
 * Data  
    * TCGA-BRCA  
       * HTSeq - FPKM  
@@ -24,3 +25,9 @@ The file structure looks something like this:
    * TCGA-UCEC  
    * TCGA-KIRC  
    * TCGA-LUAD  
+```
+
+you can downoad the necessary modules using pip
+```
+pip install -r requirements.txt
+```
