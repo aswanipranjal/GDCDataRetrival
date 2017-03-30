@@ -12,15 +12,15 @@ of TSVs in a text file
 
 The file structure looks something like this:
 * Data  
- * TCGA-BRCA  
-    * HTSeq - FPKM  
-      * file1.txt.gz  
-      * file2.txt.gz  
-    * HTSeq - FPKM-UQ  
-      * file1.txt.gz  
-      * file2.txt.gz  
-    * HTSeq - FPKM.txt  
-    * HTSeq - FPKM-UQ  
- * TCGA-UCEC  
- * TCGA-KIRC  
- * TCGA-LUAD  
+   * TCGA-BRCA  
+      * HTSeq - FPKM  
+         * file1.txt.gz  
+         * file2.txt.gz  
+      * HTSeq - FPKM-UQ  
+         * file1.txt.gz  
+         * file2.txt.gz  
+      * HTSeq - FPKM.txt  
+      * HTSeq - FPKM-UQ  
+   * TCGA-UCEC  
+   * TCGA-KIRC  
+   * TCGA-LUAD  
