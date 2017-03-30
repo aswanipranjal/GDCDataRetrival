@@ -7,7 +7,7 @@ import api
 
 from functools import reduce
 
-PROGRAM_NAME = "TCGA" # Right now we are focusing on TCGA. GDC provides us with TCGA and TARGER
+PROGRAM_NAME = "TCGA" # Right now we are focusing on TCGA. GDC provides us with TCGA and TARGET project data
 
 DATA_TYPE = "Gene Expression Quantification" # Data type to be downloaded 
 
@@ -48,7 +48,7 @@ PROJECT_ID = ["TCGA-BRCA",
 "TCGA-DLBC",
 "TCGA-CHOL"]
 
-NUM_FILES = 10
+NUM_FILES = 10 # number of files to be downloaded
 
 def create_dir(dir_name):
     if type(dir_name) == type([]):
@@ -65,21 +65,22 @@ def main():
     cwd_path.append("Data")
     create_dir(cwd_path)
 
-    # using gdctools' api.py file:
-
-    # adding appropriate filters:
+    # we will be searching GDC using the files end point as we can then specify the access criteria
     query_object = api.GDCQuery(endpoint = "files")
+    # adding the open filter so as to download files that are freely available
     query_object.add_in_filter("file.access", "open")
     query_object.add_in_filter("cases.project.program.name", PROGRAM_NAME)
     query_object.add_in_filter("files.data_type", DATA_TYPE)
 
     for PI in PROJECT_ID:
         cwd_path.append(PI)
-        #create a folder for the current Project ID
+        # create a folder for the current Project ID
         create_dir(cwd_path)
+        # add the project id into the list of filters we are using
         query_object.add_in_filter("cases.project.project_id", PI)
 
         for WFT in WORKFLOW_TYPES:
+            # add the workflow type into the list of filters we are using
             query_object.add_in_filter("files.analysis.workflow_type", WFT)
             query_object.get(page_size=500)
 
@@ -87,6 +88,8 @@ def main():
                 cwd_path.append(WFT)
                 #create a folder for the current work-flow type
                 create_dir(cwd_path)
+                
+                #this is the list containing pandas.dataframe objects for each of the file that we have downloaded
                 dataframe_files = []
 
                 for item in query_object.hits[:NUM_FILES]:
@@ -95,10 +98,13 @@ def main():
                     api.py_download_file(item["file_id"], filename)
 
                     with gzip.open(filename, 'rb') as f:
+                        # unzip the downloaded file and convert it into a dataframe object
                         dataframe_files.append(pandas.read_table(f, names=["Gene", item["submitter_id"] ]))
-                
+                        
+                # merge all the downloaded files 
                 df_final = reduce(lambda left,right: pandas.merge(left,right,on='Gene'), dataframe_files)
-                #create a condensed TSV file having all the downloaded samples
+                
+                # create a condensed TSV file having all the downloaded samples
                 df_final.to_csv("/".join(cwd_path)+".txt", sep = " ", index = False)
                 cwd_path.pop()
             query_object._filters.pop()
