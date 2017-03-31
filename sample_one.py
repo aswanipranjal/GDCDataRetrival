@@ -87,7 +87,7 @@ def main():
                     filename = "/".join(cwd_path) + "/" + item["file_name"]
                     print("Downloading file: "+filename)
                     api.py_download_file(item["file_id"], filename)
-                    dataframe_files.append(api.gzip_to_dataframe(filename, column_names=["Gene", item["submitter_id"] ]))
+                    dataframe_files.append(api.gzip_to_dataframe(filename, column_names=["Gene", item["submitter_id"]]))
                     
                 # merge all the downloaded files 
                 df_final = api.merge_dataframes(dataframe_files, 'Gene')
