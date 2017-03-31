@@ -14,39 +14,9 @@ DATA_TYPE = "Gene Expression Quantification" # Data type to be downloaded
 WORKFLOW_TYPES = ["HTSeq - FPKM", "HTSeq - FPKM-UQ"] # Work-flow type to be downloaded
 
 # We shall download the data according to the project id.
-PROJECT_ID = ["TCGA-BRCA",
-"TCGA-UCEC",
-"TCGA-KIRC",
-"TCGA-LUAD",
-"TCGA-LGG",
-"TCGA-THCA",
-"TCGA-HNSC",
-"TCGA-LUSC",
-"TCGA-PRAD",
-"TCGA-SKCM",
-"TCGA-COAD",
-"TCGA-BLCA",
-"TCGA-STAD",
-"TCGA-OV",
-"TCGA-LIHC",
-"TCGA-CESC",
-"TCGA-KIRP",
-"TCGA-SARC",
-"TCGA-PCPG",
-"TCGA-PAAD",
-"TCGA-READ",
-"TCGA-GBM",
-"TCGA-ESCA",
-"TCGA-LAML",
-"TCGA-TGCT",
-"TCGA-THYM",
-"TCGA-MESO",
-"TCGA-UVM",
-"TCGA-ACC",
-"TCGA-KICH",
-"TCGA-UCS",
-"TCGA-DLBC",
-"TCGA-CHOL"]
+with open("project_ids.json") as df:
+    project_ids = json.load(df)
+PROJECT_ID = project_ids["PROJECT_ID"]
 
 NUM_FILES = 10 # number of files to be downloaded
 
