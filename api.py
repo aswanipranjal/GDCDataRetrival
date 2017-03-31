@@ -364,3 +364,6 @@ def gzip_to_dataframe(filename, column_names = None):
     
 def merge_dataframes(df_list, col_name = None):
     return reduce(lambda left,right: pandas.merge(left,right,on=col_name), df_list)
+
+def transfer_filters(GDCQuery_object):
+    return GDCQuery_object._filters
