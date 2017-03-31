@@ -12,6 +12,9 @@ GDCQuery class and high-level API functions
 
 # }}}
 
+# I have modified this file a bit and added some new functions.
+# This allows me to have less files and hence less confusion and of course: modularity.
+
 import requests
 import json
 import logging
@@ -235,7 +238,7 @@ def py_download_file(uuid, file_name, chunk_size=4096):
     total_length = int(r.headers.get('content-length'))
     # TODO: Optimize chunk size
     # Larger chunk size == more memory, but fewer packets
-    with open(file_name, 'wb') as f:
+    with open(file_name, 'wb') as f: 
         for chunk in progress.bar(r.iter_content(chunk_size=chunk_size), expected_size=(total_length/chunk_size) + 1): 
             if chunk:
                 f.write(chunk)
@@ -339,3 +342,22 @@ def set_verbosity(verbosity):
 
 def get_verbosity():
     return __verbosity
+
+############################################
+
+def create_dir(dir_name):
+    if type(dir_name) == type([]):
+        dir_name = "/".join(dir_name)
+    if not os.path.exists(dir_name):
+        print("creating directory: " + dir_name)
+        os.makedirs(dir_name)
+    else:
+        print(dir_name + " already exists.")
+        
+def gzip_to_dataframe(filename, column_names = None):
+    with gzip.open(filename, 'rb') as f:
+        # unzip the file and convert it into a dataframe object
+        return pandas.read_table(f, names = column_names)
+    
+def merge_dataframes(df_list, col_name = None):
+    return reduce(lambda left,right: pandas.merge(left,right,on=col_name), df_list)
