@@ -21,8 +21,11 @@ import logging
 import subprocess
 import os
 import errno
+import gzip
+import pandas
 
 from clint.textui import progress
+from functools import reduce
 
 __legacy = False
 __verbosity = 0

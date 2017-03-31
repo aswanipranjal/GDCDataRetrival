@@ -1,11 +1,7 @@
 import os
 import json
-import requests
-import gzip
-import pandas
 import api
-
-from functools import reduce
+import pandas
 
 PROGRAM_NAME = "TCGA" # Right now we are focusing on TCGA. GDC provides us with TCGA and TARGET project data
 
@@ -23,7 +19,7 @@ NUM_FILES = 10 # number of files to be downloaded
 def main():
 
     cwd_path = [os.getcwd()]
-    cwd_path.append("Data")
+    cwd_path.append("FileData")
     api.create_dir(cwd_path)
 
     # we will be searching GDC using the files end point as we can then specify the access criteria
@@ -59,6 +55,11 @@ def main():
                     api.py_download_file(item["file_id"], filename)
                     dataframe_files.append(api.gzip_to_dataframe(filename, column_names=["Gene", item["submitter_id"]]))
                     
+                # if the file already exists, retrieve the data from it and add it to the dataframe list
+                if os.path.exists("/".join(cwd_path)+".txt"):
+                    print("Appending to existing file")
+                    dataframe_files.append(pandas.read_csv("/".join(cwd_path)+".txt", sep = " "))
+
                 # merge all the downloaded files 
                 df_final = api.merge_dataframes(dataframe_files, 'Gene')
                 # create a condensed TSV file having all the downloaded samples
