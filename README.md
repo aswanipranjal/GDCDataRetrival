@@ -5,10 +5,16 @@ Both the scripts use [gdctools](https://github.com/broadinstitute/gdctools) util
 (I did teeny tiny modifications and created some functions)
 
 It will download all files belonging to a particular data type in all Project IDs present in a Project.
-All files will be downloaded in a /FileData folder. 
+All files will be downloaded in a folder. 
 
-# sample_one.py This file labels the columns according to the file name.
-# sample_two.py This file labels the columns according to the submitter id, ex: TCGA-AB-C123
+```
+sample_one.py 
+This file labels the columns according to the file name.
+```
+```
+sample_two.py 
+This file labels the columns according to the submitter id, ex: TCGA-AB-C123
+```
 
 A folder will be created for each Project ID and inside that folder 10 files will be downloaded for each
 work-flow type specified. The folder will also contain a summary of all the files downloaded in the form
