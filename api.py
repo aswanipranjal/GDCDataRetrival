@@ -28,7 +28,7 @@ from clint.textui import progress
 from functools import reduce
 
 __legacy = False
-__verbosity = 0
+__verbosity = 1
 logging.getLogger("requests").setLevel(logging.WARNING)
 
 class GDCQuery(object):
@@ -37,7 +37,7 @@ class GDCQuery(object):
     GDC_ROOT = 'https://gdc-api.nci.nih.gov/'
 
     # Queries returning more than this many results will log a warning
-    WARN_RESULT_CT = 5000
+    WARN_RESULT_CT = 1000
 
     def __init__(self, endpoint, fields=None, expand=None, filters=None):
         self._endpoint = endpoint.lower()               # normalize to lowercase
@@ -90,7 +90,7 @@ class GDCQuery(object):
                 params['filters'] = json.dumps(_and_filter(self._filters))
         return params
 
-    def _query_paginator(self, page_size=1000, from_idx=1, to_idx=-1):
+    def _query_paginator(self, page_size=500, from_idx=1, to_idx=-1):
         '''Returns list of hits, iterating over server paging'''
         endpoint = self._base_url()
 
@@ -154,7 +154,7 @@ class GDCQuery(object):
         self.hits = all_hits
         return all_hits # Chop off hits on the last page if they exceed to_idx
 
-    def get(self, page_size=1000):
+    def get(self, page_size=500):
         return self._query_paginator(page_size=page_size)
 
 def get_projects(program=None):
@@ -241,10 +241,15 @@ def py_download_file(uuid, file_name, chunk_size=4096):
     total_length = int(r.headers.get('content-length'))
     # TODO: Optimize chunk size
     # Larger chunk size == more memory, but fewer packets
-    with open(file_name, 'wb') as f: 
-        for chunk in progress.bar(r.iter_content(chunk_size=chunk_size), expected_size=(total_length/chunk_size) + 1): 
-            if chunk:
-                f.write(chunk)
+    with open(file_name, 'wb') as f:
+        try:
+            for chunk in progress.bar(r.iter_content(chunk_size=chunk_size), expected_size=(total_length/chunk_size) + 1): 
+                if chunk:
+                    f.write(chunk)
+        except:
+            print("exception occurred while getting chunks of file, aborting current download\n")
+            pass
+            r = None
 
     # Return the response, which includes status_code, http headers, etc.
     return r
